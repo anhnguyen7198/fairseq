@@ -10,6 +10,7 @@ from .fairseq_dataset import FairseqDataset, FairseqIterableDataset
 
 from .base_wrapper_dataset import BaseWrapperDataset
 
+from .assert_dataset import AssertDataset
 from .add_target_dataset import AddTargetDataset
 from .append_token_dataset import AppendTokenDataset
 from .audio.raw_audio_dataset import BinarizedAudioDataset, FileAudioDataset
@@ -53,11 +54,13 @@ from .subsample_dataset import SubsampleDataset
 from .token_block_dataset import TokenBlockDataset
 from .transform_eos_dataset import TransformEosDataset
 from .transform_eos_lang_pair_dataset import TransformEosLangPairDataset
+from .safe_dataset import SafeDataset
 from .shorten_dataset import TruncateDataset, RandomCropDataset
 from .multilingual.sampled_multi_dataset import SampledMultiDataset
 from .multilingual.sampled_multi_epoch_dataset import SampledMultiEpochDataset
 from .fasta_dataset import FastaDataset, EncodedFastaDataset
 from .transform_eos_concat_langpair_dataset import TransformEosConcatLangPairDataset
+from .causal_masked_dataset import CausalMaskedDataset, IncludeTargetsForCausalLanguageModeling
 
 from .iterators import (
     CountingIterator,
@@ -69,10 +72,12 @@ from .iterators import (
 __all__ = [
     "AddTargetDataset",
     "AppendTokenDataset",
+    "AssertDataset",
     "BacktranslationDataset",
     "BaseWrapperDataset",
     "BinarizedAudioDataset",
     "BucketPadLengthDataset",
+    "CausalMaskedDataset",
     "ColorizeDataset",
     "ConcatDataset",
     "ConcatSentencesDataset",
@@ -88,6 +93,7 @@ __all__ = [
     "GroupedIterator",
     "HubertDataset",
     "IdDataset",
+    "IncludeTargetsForCausalLanguageModeling",
     "IndexedCachedDataset",
     "IndexedDataset",
     "IndexedRawTextDataset",
@@ -115,6 +121,7 @@ __all__ = [
     "RightPadDataset",
     "RollDataset",
     "RoundRobinZipDatasets",
+    "SafeDataset",
     "SampledMultiDataset",
     "SampledMultiEpochDataset",
     "ShardedIterator",
