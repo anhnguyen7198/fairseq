@@ -6,6 +6,7 @@
 import math
 from dataclasses import dataclass
 
+import torch
 import torch.nn.functional as F
 from fairseq import metrics, utils
 from fairseq.criterions import FairseqCriterion, register_criterion
@@ -24,7 +25,8 @@ class WeightedCrossEntropy(FairseqCriterion):
         super().__init__(task)
         self.sentence_avg = sentence_avg
         self.dictionary = task.dictionary
-
+    
+        self.sentinel_tokens = []
         for i in range(256):
             self.sentinel_tokens.append(self.dictionary.index(f"<sentinel:{i}>"))
     
