@@ -116,8 +116,9 @@ class CPUAdam(torch.optim.Optimizer):
 
         self.ds_opt_adam = _get_cpu_adam()
         adamw_mode = True
+        should_log = False
         self.ds_opt_adam.create_adam(
-            self.opt_id, lr, betas[0], betas[1], eps, weight_decay, adamw_mode
+            self.opt_id, lr, betas[0], betas[1], eps, weight_decay, adamw_mode, should_log)
         )
 
     @property
