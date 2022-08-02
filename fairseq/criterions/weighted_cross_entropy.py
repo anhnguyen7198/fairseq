@@ -58,6 +58,11 @@ class WeightedCrossEntropy(FairseqCriterion):
         lprobs = model.get_normalized_probs(net_output, log_probs=True)
         lprobs = lprobs.view(-1, lprobs.size(-1))
         target = model.get_targets(sample, net_output).view(-1)
+
+        if self.criterion_weights.device.type == "cpu":
+            device = lprobs.device
+            self.criterion_weights = self.criterion_weights.to(device=device)
+
         loss = F.nll_loss(
             lprobs,
             target,
