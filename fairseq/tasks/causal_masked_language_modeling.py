@@ -174,15 +174,15 @@ class CausalMaskedLanguageModelingTask(LanguageModelingTask):
                 pad_to_bsz=pad_to_bsz,
             ), safe_collate=True, rounds_index_selection=5)
 
-            dataset = AssertDataset(dataset)
-            dataset.add_assertion(lambda x: x['source'].size(0) < self.args.tokens_per_sample,
-                                  "Dataset produces more tokens than allowed in source")
-            dataset.add_assertion(lambda x: x['target'].size(0) < self.args.tokens_per_sample,
-                                  "Dataset produces more tokens than allowed in target")
-            dataset.add_assertion(lambda x: (x['source'] < len(self.source_dictionary)).all(),
-                                  "Dataset produces tokens outside vocab in source")
-            dataset.add_assertion(lambda x: (x['target'] < len(self.target_dictionary)).all(),
-                                  "Dataset produces tokens outside vocab in target")
+            #dataset = AssertDataset(dataset)
+            #dataset.add_assertion(lambda x: x['source'].size(0) < self.args.tokens_per_sample,
+            #                      "Dataset produces more tokens than allowed in source")
+            #dataset.add_assertion(lambda x: x['target'].size(0) < self.args.tokens_per_sample,
+            #                      "Dataset produces more tokens than allowed in target")
+            #dataset.add_assertion(lambda x: (x['source'] < len(self.source_dictionary)).all(),
+            #                      "Dataset produces tokens outside vocab in source")
+            #dataset.add_assertion(lambda x: (x['target'] < len(self.target_dictionary)).all(),
+            #                      "Dataset produces tokens outside vocab in target")
 
             self.datasets[split] = dataset
 
