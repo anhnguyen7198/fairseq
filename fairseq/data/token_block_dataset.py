@@ -10,6 +10,24 @@ from fairseq.data.indexed_dataset import best_fitting_int_dtype
 from typing import Tuple
 
 
+def token_block_into_size_with_boundaries(sizes: np.array, block: int):
+    blocked_indices = []
+    block_to_dataset_index = []
+    left_sum = 0
+    for size_index, size in enumerate(sizes):
+        if size < block:
+            blocked_indices.append([left_sum, left_sum + size])
+            block_to_dataset_index.append([size_index, 0, size_index])
+        else:
+            for ind in range(0, size, block):
+                left = ind
+                right = min(size, ind + block)
+                blocked_indices.append([left_sum + left, left_sum + right])
+                block_to_dataset_index.append([size_index, left, size_index])
+        left_sum += size
+    return np.array(block_to_dataset_index), np.array(blocked_indices)
+
+
 class TokenBlockDataset(FairseqDataset):
     """Break a Dataset of tokens into blocks.
 
@@ -110,9 +128,13 @@ class TokenBlockDataset(FairseqDataset):
         if break_mode == "eos" and block_size is None:
             block_size = 0
 
-        slice_indices = _get_slice_indices_fast(
-            sizes, str(break_mode), block_size, document_sep_len
-        )
+        if break_mode != "eos_blocked":
+            slice_indices = _get_slice_indices_fast(
+                sizes, str(break_mode), block_size, document_sep_len
+            )
+        else:
+            block_to_dataset_index, slice_indices = token_block_into_size_with_boundaries(
+                sizes, block_size)
         _sizes = slice_indices[:, 1] - slice_indices[:, 0]
 
         # build index mapping block indices to the underlying dataset indices
@@ -128,10 +150,9 @@ class TokenBlockDataset(FairseqDataset):
                 ],
                 1,
             )
-        else:
+        elif break_mode != "eos_blocked":
             block_to_dataset_index = _get_block_to_dataset_index_fast(
-                sizes,
-                slice_indices,
+                sizes, slice_indices,
             )
         size_dtype = np.uint16 if block_size < 65535 else np.uint32
         num_tokens = slice_indices[-1].max()
@@ -173,16 +194,16 @@ class TokenBlockDataset(FairseqDataset):
             # *source* is shifted right by 1 (maybe left-padded with eos)
             # *past_target* is shifted right by 2 (left-padded as needed)
             if s == 0:
-                source = torch.cat([item.new([self.eos]), buffer[0 : e - 1]])
+                source = torch.cat([item.new([self.eos]), buffer[0: e - 1]])
                 past_target = torch.cat(
-                    [item.new([self.pad, self.eos]), buffer[0 : e - 2]]
+                    [item.new([self.pad, self.eos]), buffer[0: e - 2]]
                 )
             else:
-                source = buffer[s - 1 : e - 1]
+                source = buffer[s - 1: e - 1]
                 if s == 1:
-                    past_target = torch.cat([item.new([self.eos]), buffer[0 : e - 2]])
+                    past_target = torch.cat([item.new([self.eos]), buffer[0: e - 2]])
                 else:
-                    past_target = buffer[s - 2 : e - 2]
+                    past_target = buffer[s - 2: e - 2]
 
             return source, item, past_target
 
@@ -204,3 +225,4 @@ class TokenBlockDataset(FairseqDataset):
                 for ds_idx in range(start_ds_idx, end_ds_idx + 1)
             }
         )
+

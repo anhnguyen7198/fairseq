@@ -112,8 +112,6 @@ class Encoder:
         return word
 
     def encode(self, text):
-        if text == '<|endoftext|>':
-            return 50261
         bpe_tokens = []
         for token in self.re.findall(self.pat, text):
             token = "".join(self.byte_encoder[b] for b in token.encode("utf-8"))

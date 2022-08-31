@@ -125,7 +125,7 @@ class CausalMaskedLanguageModelingTask(LanguageModelingTask):
                 raise FileNotFoundError(
                     f"Dataset not found: {split} ({split_path})")
 
-            #assert self.args.sample_break_mode == "eos" or "eos_blocked" == self.args.sample_break_mode, "Every item should be one document"
+            assert self.args.sample_break_mode == "eos" or "eos_blocked" == self.args.sample_break_mode, "Every item should be one document"
             dataset = StripTokenDataset(dataset, self.dictionary.eos())
             dataset = StripTokenDataset(dataset, self.dictionary.index("▁"))
 
@@ -141,7 +141,7 @@ class CausalMaskedLanguageModelingTask(LanguageModelingTask):
                 split_path=split_path,
                 plasma_path=self.args.plasma_path,
             )
-            #assert "eos_blocked" == self.args.sample_break_mode, self.args.sample_break_mode
+            assert "eos_blocked" == self.args.sample_break_mode, self.args.sample_break_mode
 
             dataset = CausalMaskedDataset(dataset, self.sentinel_token_expectation,
                                           self.sentinel_tokens, self.sentinel_method,
@@ -173,16 +173,6 @@ class CausalMaskedLanguageModelingTask(LanguageModelingTask):
                 fixed_pad_length=fixed_pad_length,
                 pad_to_bsz=pad_to_bsz,
             ), safe_collate=True, rounds_index_selection=5)
-
-            #dataset = AssertDataset(dataset)
-            #dataset.add_assertion(lambda x: x['source'].size(0) < self.args.tokens_per_sample,
-            #                      "Dataset produces more tokens than allowed in source")
-            #dataset.add_assertion(lambda x: x['target'].size(0) < self.args.tokens_per_sample,
-            #                      "Dataset produces more tokens than allowed in target")
-            #dataset.add_assertion(lambda x: (x['source'] < len(self.source_dictionary)).all(),
-            #                      "Dataset produces tokens outside vocab in source")
-            #dataset.add_assertion(lambda x: (x['target'] < len(self.target_dictionary)).all(),
-            #                      "Dataset produces tokens outside vocab in target")
 
             self.datasets[split] = dataset
 
